@@ -69,6 +69,40 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-view">
 
+<!-- This is the flash message div for creation of a new record of this model -->
+<?= "<?php\n" ?>
+	$session = Yii::$app->session;
+	<?php 
+		$flashName = preg_replace("/(_)/","-",$generator->getTableSchema()->name); 
+		$flashName .= "-flash"; 
+	?>
+	if($session->hasFlash('<?= $flashName ?>')){
+		echo Html::beginTag('div',['class'=>'alert alert-success alert-dismissable', 'role'=>'alert']);
+			echo $session->getFlash('<?= $flashName ?>');
+		echo Html::endTag('div');
+	}
+<?= "?>\n" ?>
+
+<!-- This section add the flash message divs for each possible child created -->
+<?= "<?php\n" ?>
+<?php foreach($generator->generateRelations() as $relTable): ?>
+<?php			
+	$refColumn = $relTable[1];
+	$refName = ucfirst($relTable[0]);
+	$refTableName = Inflector::camel2id($relTable[0],"_");
+	$refTableSchema = Yii::$app->db->getSchema()->getTableSchema($refTableName);
+	$refModel = preg_replace("/([I][dD])\b/","",Inflector::variablize($relTable[0]));
+	$flashName = preg_replace("/(_)/","-",$refTableName)."-flash";
+?>
+	if($session->hasFlash('<?= $flashName ?>')){
+		echo Html::beginTag('div',['class'=>'alert alert-success alert-dismissable', 'role'=>'alert']);
+			echo $session->getFlash('<?= $flashName ?>');
+		echo Html::endTag('div');
+	}
+<?php endforeach; ?>
+<?= "?>\n" ?>
+	
+
     <h1><?= "<?= " ?>Html::encode($this->title) ?></h1>
 
     <p>
@@ -115,6 +149,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				$refModel = preg_replace("/([I][dD])\b/","",Inflector::variablize($relTable[0]));
 				if(!$generator->isHasManyRelation($refTableSchema,$generator->getTableSchema())){
 					
+					/*
 					$createLink = "";
 					if($generator->useModalEntries){
 						$createLink .= "Modal::begin([\n";
@@ -136,7 +171,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						$createLink .= "";
 					}else{
 						$createLink .= "yii\\helpers\\HTML::a('Add ".ucfirst($refModel)."',['add-".Inflector::camel2id($refName)."','id'=>\$model->id]),\n";
-					}					
+					}*/					
 					
 					
 					// Create the Detail View attribute entry for this child record

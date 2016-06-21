@@ -61,7 +61,6 @@ class ParentDataController extends Controller
     
  
 
- 
     
     /**
      * Creates a new ParentData model.
@@ -90,6 +89,8 @@ class ParentDataController extends Controller
 			}
 			$session->close();
 
+			Yii::$app->session->setFlash('parent-data-flash','ParentData Created Successfully!');
+			
 			if(!empty($returnRoute)){
 				return $this->redirect($returnRoute);
             }else{

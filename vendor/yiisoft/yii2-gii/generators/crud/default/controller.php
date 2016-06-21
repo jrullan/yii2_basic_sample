@@ -128,6 +128,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
 					echo "\t\t\tif(!(\$child->save())){\n";
 					echo "\t\t\t\tthrow new \yii\web\HttpException(404, 'Could not save child model');\n";
 					echo "\t\t\t}\n";
+					echo "\t\t\tYii::\$app->session->setFlash('".$relTableName."-flash','".$modelName." Created Successfully!');\n";
 					echo "\t\t}\n";
 				}
 				
@@ -216,20 +217,25 @@ foreach($generator->generateRelations() as $relTable){
 	$sessionVal = "['route'=>'".Inflector::camel2id($modelClass)."/view','id'=>\$id]";
 	
 	// Check if it is a One-To-One relationship
-	if(!$generator->isHasManyRelation($refTableSchema,$generator->getTableSchema())){
-		$functionName = "Add".ucfirst($relTable[0]);
-		echo "\n\tpublic function action".$functionName."(\$id)\n";
-		echo "\t{\n";
-		echo "\t\t\$session = Yii::\$app->session;\n";
-		echo "\t\t\$session->open();\n";
-		echo "\t\t\$session->set('".$sessionVar."',".$sessionVal.");\n";
-		echo "\t\t\$session->close();\n";
-		echo "\t\treturn \$this->redirect(['".$route."/create','".$refColumn."'=>\$id]);\n";
-		//echo "\t\t;\n";
-		echo "\t}\n\n";
-	}
+	if(!$generator->isHasManyRelation($refTableSchema,$generator->getTableSchema())){ ?>
+<?php $functionName = "Add".ucfirst($relTable[0]); ?>
+		/**
+		 * Action to add related <?= ucfirst($relTable[0]); ?> records
+		 * <?= ucfirst($relTable[0]); ?> is a one-to-one child record of <?= $modelClass ?>.
+		 * After creation of <?= ucfirst($relTable[0]); ?> the controller will redirect to
+		 * <?= $modelClass ?>Controller / view with the supplied $id.
+		 */
+		public function action<?= $functionName ?>($id){
+			$session = Yii::$app->session;
+			$session->open();
+			$session->set('<?= $sessionVar ?>',<?= $sessionVal ?>);
+			$session->close();
+			return $this->redirect(['<?= $route ?>/create','<?= $refColumn ?>'=>$id]);
+		}
+	<?php	
+	} 
 }
-?> 
+?>
     
     /**
      * Creates a new <?= $modelClass ?> model.
@@ -268,6 +274,8 @@ foreach($generator->generateRelations() as $relTable){
 			}
 			$session->close();
 
+			Yii::$app->session->setFlash('<?= $thisTableName."-flash" ?>','<?= $modelClass ?> Created Successfully!');
+			
 			if(!empty($returnRoute)){
 				return $this->redirect($returnRoute);
             }else{

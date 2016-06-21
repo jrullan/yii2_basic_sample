@@ -66,6 +66,7 @@ class ChildController extends Controller
 			if(!($child->save())){
 				throw new \yii\web\HttpException(404, 'Could not save child model');
 			}
+			Yii::$app->session->setFlash('grandchild-flash','Grandchild Created Successfully!');
 		}
 
 	
@@ -78,7 +79,6 @@ class ChildController extends Controller
     
  
 
- 
     
     /**
      * Creates a new Child model.
@@ -107,6 +107,8 @@ class ChildController extends Controller
 			}
 			$session->close();
 
+			Yii::$app->session->setFlash('child-flash','Child Created Successfully!');
+			
 			if(!empty($returnRoute)){
 				return $this->redirect($returnRoute);
             }else{

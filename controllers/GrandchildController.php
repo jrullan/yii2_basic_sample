@@ -61,7 +61,6 @@ class GrandchildController extends Controller
     
  
 
- 
     
     /**
      * Creates a new Grandchild model.
@@ -90,6 +89,8 @@ class GrandchildController extends Controller
 			}
 			$session->close();
 
+			Yii::$app->session->setFlash('grandchild-flash','Grandchild Created Successfully!');
+			
 			if(!empty($returnRoute)){
 				return $this->redirect($returnRoute);
             }else{

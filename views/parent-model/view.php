@@ -21,6 +21,31 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="parent-model-view">
 
+<!-- This is the flash message div for creation of a new record of this model -->
+<?php
+	$session = Yii::$app->session;
+		if($session->hasFlash('parent-model-flash')){
+		echo Html::beginTag('div',['class'=>'alert alert-success alert-dismissable', 'role'=>'alert']);
+			echo $session->getFlash('parent-model-flash');
+		echo Html::endTag('div');
+	}
+?>
+
+<!-- This section add the flash message divs for each possible child created -->
+<?php
+	if($session->hasFlash('child-flash')){
+		echo Html::beginTag('div',['class'=>'alert alert-success alert-dismissable', 'role'=>'alert']);
+			echo $session->getFlash('child-flash');
+		echo Html::endTag('div');
+	}
+	if($session->hasFlash('parent-data-flash')){
+		echo Html::beginTag('div',['class'=>'alert alert-success alert-dismissable', 'role'=>'alert']);
+			echo $session->getFlash('parent-data-flash');
+		echo Html::endTag('div');
+	}
+?>
+	
+
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>

@@ -67,6 +67,7 @@ class ParentModelController extends Controller
 			if(!($child->save())){
 				throw new \yii\web\HttpException(404, 'Could not save child model');
 			}
+			Yii::$app->session->setFlash('child-flash','Child Created Successfully!');
 		}
 
 		$parentDataModel = new ParentData();
@@ -82,18 +83,20 @@ class ParentModelController extends Controller
     
  
 
-
-	public function actionAddParentData($id)
-	{
-		$session = Yii::$app->session;
-		$session->open();
-		$session->set('parent-data',['route'=>'parent-model/view','id'=>$id]);
-		$session->close();
-		return $this->redirect(['parent-data/create','parent_model_id'=>$id]);
-	}
-
- 
-    
+		/**
+		 * Action to add related ParentData records
+		 * ParentData is a one-to-one child record of ParentModel.
+		 * After creation of ParentData the controller will redirect to
+		 * ParentModelController / view with the supplied $id.
+		 */
+		public function actionAddParentData($id){
+			$session = Yii::$app->session;
+			$session->open();
+			$session->set('parent-data',['route'=>'parent-model/view','id'=>$id]);
+			$session->close();
+			return $this->redirect(['parent-data/create','parent_model_id'=>$id]);
+		}
+	    
     /**
      * Creates a new ParentModel model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -117,6 +120,8 @@ class ParentModelController extends Controller
 			}
 			$session->close();
 
+			Yii::$app->session->setFlash('parent-model-flash','ParentModel Created Successfully!');
+			
 			if(!empty($returnRoute)){
 				return $this->redirect($returnRoute);
             }else{
